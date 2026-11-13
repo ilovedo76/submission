@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<base href="../pages/">
+<title>dashboard preview</title>
+</head>
+<body>
+<!--
+  Local preview of web/pages/index.html with a fake window.claude over web/tools/dashboard_fixture.json.
+    cd web && python -m http.server 8765
+    http://localhost:8765/tools/preview_dashboard.html            (sample + user runs)
+    ...?mode=nodb | ?mode=empty | ?mode=hang (10 s, then the signed-out message)
+  The fixture comes from the SYNTH workbook (make_dashboard_fixture.py), never the company file.
+-->
+<script type="module">
+  import { fakeClaude } from "/tools/fake_claude.js";
+  const q0 = new URLSearchParams(location.search);
+  if (q0.has("w")) {                    // narrow-screen check: the same preview inside a w-px iframe
+    const w = q0.get("w"); q0.delete("w");
+    document.body.style.margin = "0";
+    document.body.innerHTML = `<iframe src="/tools/preview_dashboard.html?${q0}" style="width:${w}px;height:4400px;border:0;display:block"></iframe>`;
+    throw new Error("framed");
+  }
+  const mode = q0.get("mode") || "ok";
+  const docs = mode === "empty" ? {} : await (await fetch("/tools/dashboard_fixture.json")).json();
+  window.claude = fakeClaude(docs, { names: { u_alice: "김품질" }, mode: mode === "empty" ? "ok" : mode });
+  const html = await (await fetch("index.html")).text();
+  const host = document.createElement("div");
+  host.innerHTML = html;
+  const scripts = [...host.querySelectorAll("script")];
+  scripts.forEach((s) => s.remove());
+  document.body.append(...host.childNodes);
+  for (const old of scripts) {          // re-create so they run, in order
+    const s = document.createElement("script");
+    for (const a of old.attributes) s.setAttribute(a.name, a.value);
+    s.textContent = old.textContent;
+    if (s.src) await new Promise((ok, bad) => { s.onload = ok; s.onerror = bad; document.body.append(s); });
+    else document.body.append(s);
+  }
+  // ?run=<runId>&model=<model>&period=all: drive the controls once the data is in
+  const q = new URLSearchParams(location.search);
+  const set = (id, v) => { const el = document.getElementById(id); el.value = v; el.dispatchEvent(new Event("change")); };
+  if (q.has("run") || q.has("model") || q.has("period")) {
+    await new Promise((r) => setTimeout(r, 1500));
+    if (q.has("run")) { set("f-run", q.get("run")); await new Promise((r) => setTimeout(r, 800)); }
+    if (q.has("model")) set("f-model", q.get("model"));
+    if (q.has("period")) set("f-period", q.get("period"));
+  }
+  if (q.has("debug")) {                 // layout probe for headless runs (--dump-dom)
+    await new Promise((r) => setTimeout(r, 2500));
+    const wide = [...document.querySelectorAll("body *")].filter((e) => e.getBoundingClientRect().right > innerWidth + 1)
+      .slice(0, 8).map((e) => `${e.tagName}.${e.className}#${e.id}:${Math.round(e.getBoundingClientRect().right)}`);
+    document.body.dataset.probe = JSON.stringify({ innerWidth, scrollWidth: document.documentElement.scrollWidth, wide });
+  }
+</script>
+</body>
+</html>

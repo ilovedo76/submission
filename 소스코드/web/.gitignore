@@ -1,0 +1,5 @@
+node_modules/
+# company-derived seed summaries are generated at build time, never committed
+seed/*.json
+vendor/
+publish/

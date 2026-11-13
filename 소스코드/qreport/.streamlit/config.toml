@@ -1,0 +1,40 @@
+[browser]
+gatherUsageStats = false
+
+[server]
+showEmailPrompt = false
+enableStaticServing = true   # serves src/qreport/app/static (the bundled fonts) from this PC only
+
+# 강렬한레드 design system: one red on warm paper, square corners, no shadows.
+# Fonts are local only (no network). Bithumb Gothic ships in one weight (bold), so it is the display
+# face (titles, labels, buttons); body text uses Noto Sans KR if installed, else system fonts.
+[[theme.fontFaces]]
+family = "Bithumb Gothic"
+url = "app/static/BithumbGothic-Basic.ttf"
+weight = 700
+style = "normal"
+
+[[theme.fontFaces]]
+family = "Bithumb Gothic"
+url = "app/static/BithumbGothic-Original.ttf"
+weight = 700
+style = "italic"
+
+[theme]
+base = "light"
+primaryColor = "#cf2e2a"
+backgroundColor = "#e9e7e0"
+secondaryBackgroundColor = "#dddcd7"
+textColor = "#363434"
+linkColor = "#b3241f"
+borderColor = "#c9c6bd"
+showWidgetBorder = true
+showSidebarBorder = true
+baseRadius = "2px"
+buttonRadius = "2px"
+font = "'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif"
+headingFont = "'Bithumb Gothic', 'Noto Sans KR', 'Malgun Gothic', system-ui, sans-serif"
+
+[theme.sidebar]
+backgroundColor = "#dddcd7"
+secondaryBackgroundColor = "#e9e7e0"

@@ -1,0 +1,15 @@
+{
+  "name": "qreport-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Browser (Pyodide) dashboard + hands-on MVP for the qreport engine",
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "test:parity": "node --test tools/test_parity.mjs",
+    "pyodide:check": "node tools/pyodide_check.mjs"
+  },
+  "devDependencies": {
+    "pyodide": "314.0.7"
+  }
+}

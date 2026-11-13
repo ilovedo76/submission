@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qreport"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "pandas", "numpy", "scipy", "openpyxl", "matplotlib",
+  "docxtpl", "reportlab", "streamlit",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pillow", "pypdf"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+qreport = ["templates/*.docx", "app/static/*.ttf"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

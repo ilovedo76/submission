@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>체험형 MVP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="app.css">
+<style>
+  /* base styles in case app.css is slow: page never renders unstyled-white */
+  html, body { margin: 0; background: #e9e7e0; color: #363434; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>체험형 MVP</h1>
+    <a class="back" href="./index.html">← 품질 현황판</a>
+  </header>
+
+  <section id="engine" class="engine" aria-live="polite">
+    <div class="engine-row">
+      <span id="engine-text">분석 엔진 준비 중…</span>
+      <button id="engine-retry" class="btn ghost" type="button" hidden>다시 시도</button>
+    </div>
+    <div class="bar"><div id="engine-bar" class="bar-fill" style="width:0%"></div></div>
+  </section>
+
+  <section class="panel" aria-labelledby="h-upload">
+    <h2 id="h-upload">1. 데이터 올리기</h2>
+    <label id="drop" class="drop" for="file-input">
+      <input id="file-input" type="file" accept=".xlsx,.xlsm" multiple disabled>
+      <strong>엑셀 파일(.xlsx, .xlsm)을 끌어다 놓거나 눌러서 고르세요</strong>
+      <span class="muted">여러 파일을 한 번에 올릴 수 있습니다 (RawData · 생산량 · 판매량).</span>
+    </label>
+    <ul id="file-list" class="file-list"></ul>
+    <div class="row">
+      <button id="sample-run" class="btn" type="button" disabled>샘플 데이터로 해보기</button>
+      <button id="sample-save" class="btn ghost" type="button" hidden>샘플 파일 내려받기</button>
+    </div>
+    <p class="muted small">샘플은 기업 양식과 같은 형태로 만든 <b>가상 데이터</b>입니다. 실제 기업 수치가 아닙니다.</p>
+  </section>
+
+  <form id="analyze-form" class="panel" aria-labelledby="h-analyze">
+    <h2 id="h-analyze">2. 분석 조건</h2>
+    <div class="fields">
+      <label class="field">
+        <span>기준월</span>
+        <select id="base" disabled><option value="">자동 (마지막 발생월)</option></select>
+      </label>
+      <label class="field">
+        <span>AS 처리비 (건당, 원 · 선택)</span>
+        <input id="as-cost" type="number" min="0" step="1000" inputmode="numeric" placeholder="예: 85000">
+      </label>
+      <button id="analyze" class="btn primary" type="submit" disabled>분석</button>
+    </div>
+  </form>
+
+  <div id="message" class="message" role="alert" hidden></div>
+
+  <section id="results" hidden>
+    <div class="result-head">
+      <h2>3. 분석 결과</h2>
+      <span id="save-chip" class="chip" hidden></span>
+    </div>
+    <div id="sample-banner" class="banner" hidden>가상 데이터 — 체험용 샘플로 만든 결과입니다.</div>
+    <p id="validation" class="validation"></p>
+
+    <div id="verdict" class="verdict">
+      <div class="verdict-title"><span id="verdict-mark"></span> 종합 판정: <b id="verdict-word"></b></div>
+      <p id="verdict-line"></p>
+      <dl class="verdict-facts">
+        <div><dt>예상 추가 접수</dt><dd id="forecast"></dd></div>
+        <div><dt>예상 비용</dt><dd id="cost"></dd></div>
+      </dl>
+    </div>
+
+    <h3>경고 <span id="alert-count" class="muted"></span></h3>
+    <div id="alerts" class="alerts"></div>
+
+    <section id="charts" class="panel charts" aria-labelledby="h-charts">
+      <div class="charts-head">
+        <h3 id="h-charts">차트</h3>
+        <label class="field inline"><span>모델</span><select id="model"></select></label>
+      </div>
+      <div id="chart-keys" class="chart-keys" role="radiogroup" aria-label="차트 선택"></div>
+      <div class="chart-box">
+        <p id="chart-wait" class="muted">차트를 그리는 중…</p>
+        <img id="chart-img" alt="" hidden>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="h-notes">
+      <h3 id="h-notes">작성란</h3>
+      <label class="field block">
+        <span>이슈</span>
+        <textarea id="issues" rows="4" placeholder="이번 달 주요 이슈를 적어 주세요."></textarea>
+      </label>
+      <div class="plan-head"><span>개선 계획</span></div>
+      <div class="plan-wrap">
+        <table class="plan">
+          <thead><tr><th>담당</th><th>일정</th><th>대책</th><th><span class="sr">삭제</span></th></tr></thead>
+          <tbody id="plan-body"></tbody>
+        </table>
+      </div>
+      <button id="plan-add" class="btn ghost" type="button">행 추가</button>
+      <p id="notes-status" class="muted small" aria-live="polite"></p>
+    </section>
+
+    <section class="panel" aria-labelledby="h-down">
+      <h3 id="h-down">내려받기</h3>
+      <div id="down-buttons" class="row" hidden>
+        <button class="btn" type="button" data-fmt="docx">Word 보고서</button>
+        <button class="btn" type="button" data-fmt="pdf">PDF 보고서</button>
+        <button class="btn" type="button" data-fmt="zip">차트 ZIP</button>
+      </div>
+      <p id="down-note" class="muted small">내려받기 기능을 확인하는 중…</p>
+    </section>
+  </section>
+</div>
+<script type="module" src="js/mvp.js"></script>
+</body>
+</html>

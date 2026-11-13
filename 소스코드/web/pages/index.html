@@ -1,0 +1,92 @@
+<title>품질 현황판</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* first paint before dashboard.css arrives; single light look (qreport theme), every color explicit */
+  :root { color-scheme: light; }
+  html, body { background: #e9e7e0; color: #363434; margin: 0; }
+  [hidden] { display: none !important; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="./dashboard.css">
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>품질 현황판</h1>
+      <p id="dash-meta" class="meta"></p>
+    </div>
+    <a class="mvp-link" href="./mvp.html">체험형 MVP 열기 →</a>
+  </header>
+
+  <div id="dash-state" class="state state-loading" role="status" aria-live="polite"><p>데이터를 불러오는 중…</p></div>
+
+  <main id="dash-main" hidden>
+    <div id="dash-sample" class="sample-banner" hidden role="note">
+      <strong>가상 데이터</strong> 체험용 샘플로 분석한 결과입니다. 실제 품질 수치가 아닙니다.
+    </div>
+
+    <section class="bar" aria-label="보기 설정">
+      <label class="field field-run"><span>데이터</span><select id="f-run"></select></label>
+      <label class="field"><span>모델</span><select id="f-model"></select></label>
+      <label class="field"><span>기간</span>
+        <select id="f-period"><option value="12">최근 12개월</option><option value="all">전체</option></select>
+      </label>
+      <button id="btn-refresh" type="button" class="btn btn-ghost">새로고침</button>
+      <p class="caption">기간 필터는 추이·P 관리도에 적용</p>
+    </section>
+
+    <section id="dash-cards" class="cards" aria-label="핵심 지표"></section>
+
+    <section id="dash-charts" class="charts" aria-label="차트">
+      <p id="dash-chart-error" class="chart-error" hidden>차트 데이터를 불러오지 못했습니다. 새로고침해 주세요.</p>
+      <article id="panel-trend" class="panel">
+        <h2 id="trend-title">시장 불량률 추이</h2>
+        <p class="note">월별 시장 불량률(불량 ÷ 판매). 회색 점선 = 중심선, 빨간 점선 = 관리상한.</p>
+        <div id="c-trend" class="chart"></div>
+      </article>
+      <article id="panel-pchart" class="panel">
+        <h2 id="pchart-title">1MIS P 관리도</h2>
+        <p class="note">생산월별 1MIS 불량률. 빨간 점 = 관리상한 이탈, 빈 원 = 연속 규칙.</p>
+        <div id="c-pchart" class="chart"></div>
+      </article>
+      <article id="panel-heatmap" class="panel">
+        <h2>생산월 × MIS 불량률</h2>
+        <p id="heatmap-note" class="note"></p>
+        <div id="c-heatmap" class="chart chart-tall"></div>
+      </article>
+      <article id="panel-pareto" class="panel">
+        <h2>불량 유형 파레토 (최근 12개월)</h2>
+        <p class="note">막대 = 유형 비중(건수 표시), 선 = 누적 비중, 점선 = 80% 누적.</p>
+        <div id="c-pareto" class="chart"></div>
+      </article>
+      <article id="panel-modelType" class="panel panel-wide">
+        <h2>모델 × 유형 증감 (최근 12개월 − 전년 12개월)</h2>
+        <p class="note">0 기준선 위 = 증가, 아래 = 감소 (건).</p>
+        <div id="c-modelType" class="chart"></div>
+      </article>
+    </section>
+
+    <section class="block" aria-labelledby="warn-h">
+      <h2 id="warn-h">경고 <span id="warn-count" class="count"></span></h2>
+      <ul id="dash-warnings" class="warnings"></ul>
+    </section>
+
+    <section class="block" aria-labelledby="hist-h">
+      <h2 id="hist-h">업로드 이력</h2>
+      <div class="table-wrap">
+        <table class="history">
+          <thead><tr><th>기준월</th><th>올린 사람</th><th>시각</th><th>판정</th><th>경고 수</th></tr></thead>
+          <tbody id="dash-history"></tbody>
+        </table>
+      </div>
+      <p class="caption">행을 누르면 그 데이터로 바뀝니다.</p>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js"></script>
+<script type="module">
+  import { start } from "./js/dashboard.js";
+  start();
+</script>
